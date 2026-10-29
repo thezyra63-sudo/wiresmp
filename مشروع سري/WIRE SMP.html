@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WIRE SMP – تقديم الأدمن</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#0d0b18;--panel:#14111f;--line:#262238;--text:#f4f2ff;--muted:#8d88a8;--accent:#8b5cf6;--accent2:#c4b5fd;--ok:#22c55e;--bad:#ef4444;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+header{padding:16px 24px;border-bottom:1px solid var(--line)}
+.logo{font-weight:900;font-size:28px;letter-spacing:1px;background:linear-gradient(90deg,#a78bfa,#fbbf24);-webkit-background-clip:text;background-clip:text;color:transparent;direction:ltr;display:inline-block}
+main{max-width:720px;margin:0 auto;padding:32px 20px 60px}
+h1{margin:0 0 6px;font-size:30px}
+.sub{color:var(--muted);margin:0 0 26px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px}
+label{display:block;font-weight:700;margin:16px 0 6px}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;background:#0f0c1b;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--text);font:inherit}
+textarea{min-height:100px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:18px;color:var(--muted)}
+.chk input{width:auto;margin-top:4px}
+button{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:13px 22px;font:inherit;font-weight:800;cursor:pointer;margin-top:20px;width:100%}
+button:disabled{opacity:.5;cursor:default}
+.msg{padding:14px;border-radius:10px;margin-top:16px;font-weight:600}
+.ok{background:#12301f;color:#86efac}.err{background:#3a1416;color:#fca5a5}
+.app{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;background:#0f0c1b}
+.app b{font-size:18px}.app p{margin:6px 0;color:var(--muted);white-space:pre-wrap}
+.row{display:flex;gap:8px;margin-top:10px}
+.row button{margin:0;padding:8px;font-size:14px}
+.acc{background:var(--ok)}.rej{background:var(--bad)}.del{background:#3a3550}
+.st{float:left;font-size:13px;font-weight:800;padding:3px 10px;border-radius:99px;background:#262238}
+.st.accepted{background:#12301f;color:#86efac}.st.rejected{background:#3a1416;color:#fca5a5}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header><div class="logo">WIRE SMP</div> <a href="https://wiresmp.wasmer.app/" target="_blank" rel="noopener" style="color:#c4b5fd;margin-inline-start:16px;text-decoration:none">موقعنا</a></header>
+<main>
+  <h1>التقديم على رتبة أدمن</h1>
+  <p class="sub">عبّ النموذج بصدق، وبنراجع طلبك ونرد عليك في الديسكورد.</p>
+
+  <div class="card" id="formCard">
+    <label>اسمك في ماينكرافت</label><input id="mc" maxlength="32">
+    <label>يوزر الديسكورد</label><input id="dc" maxlength="40" dir="ltr">
+    <label>عمرك</label><input id="age" type="number" min="10" max="99">
+    <label>كم ساعة تلعب يومياً؟</label>
+    <select id="hrs"><option>أقل من ساعتين</option><option>من 2 إلى 4 ساعات</option><option>من 4 إلى 8 ساعات</option><option>أكثر من 8 ساعات</option></select>
+    <label>خبرتك السابقة في الإدارة</label><textarea id="exp" maxlength="800" placeholder="سيرفرات أدرت فيها، مدة الخبرة..."></textarea>
+    <label>ليش تبغى تصير أدمن في WIRE SMP؟</label><textarea id="why" maxlength="800"></textarea>
+    <label>وش تسوي لو شفت لاعب يغش أو يخرب على غيره؟</label><textarea id="sit" maxlength="800"></textarea>
+    <div class="chk"><input type="checkbox" id="rules"><span>أوافق على قوانين السيرفر وأتعهد بعدم إساءة استخدام الصلاحيات.</span></div>
+    <button id="send">إرسال الطلب</button>
+    <div id="msg"></div>
+  </div>
+
+  </main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ST={pending:"قيد المراجعة",accepted:"مقبول",rejected:"مرفوض"};
+function show(t,ok){$("msg").innerHTML=`<div class="msg ${ok?"ok":"err"}">${t}</div>`}
+function build(f){return `📋 طلب تقديم أدمن – WIRE SMP
+اسم ماينكرافت: ${f.mc}
+يوزر الديسكورد: ${f.dc}
+العمر: ${f.age}
+ساعات اللعب اليومية: ${f.hrs}
+الخبرة السابقة: ${f.exp||"-"}
+سبب التقديم: ${f.why}
+الموقف (لاعب يغش): ${f.sit}
+موافق على القوانين: نعم`}
+$("send").onclick=()=>{
+  const f={mc:$("mc").value.trim(),dc:$("dc").value.trim(),age:$("age").value,hrs:$("hrs").value,exp:$("exp").value.trim(),why:$("why").value.trim(),sit:$("sit").value.trim()};
+  if(!f.mc||!f.dc||!f.age||!f.why||!f.sit)return show("عبّ الحقول المطلوبة كلها.",false);
+  if(!$("rules").checked)return show("لازم توافق على القوانين.",false);
+  const t=build(f);
+  $("msg").innerHTML=`<div class="msg ok">تم تجهيز طلبك ✅ انسخ النص تحت وأرسله في تذكرة التقديم في الديسكورد.</div>
+  <textarea id="out" readonly style="margin-top:12px;min-height:200px" dir="rtl"></textarea>
+  <button id="copy">نسخ الطلب</button>`;
+  $("out").value=t;
+  $("copy").onclick=async()=>{
+    try{await navigator.clipboard.writeText(t)}catch(e){$("out").select();document.execCommand("copy")}
+    $("copy").textContent="تم النسخ ✅";
+  };
+};
+</script>
+</body>
+</html>
